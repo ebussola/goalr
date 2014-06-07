@@ -17,6 +17,19 @@ class GoalrTest extends PHPUnit_Framework_TestCase {
         $this->goalr = new \ebussola\goalr\Goalr();
     }
 
+    public function testGoalrAnotherDate()
+    {
+        $goal = new \ebussola\goalr\goal\Goal();
+        $goal->id = 1;
+        $goal->date_start = new DateTime('today');
+        $goal->date_end = new DateTime('today + 29 days');
+        $goal->total_budget = 37020;
+
+        $goalr = new \ebussola\goalr\Goalr(new DateTime('+ 5 days'));
+        $daily_budget = $goalr->getDailyBudget($goal, 0);
+        $this->assertEquals(1542.5, $daily_budget);
+    }
+
     public function testGetDailyBudget_level1() {
         $goal = new \ebussola\goalr\goal\Goal();
         $goal->id = 1;

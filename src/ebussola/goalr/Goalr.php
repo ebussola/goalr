@@ -18,8 +18,10 @@ class Goalr {
 
     public function __construct(\DateTime $current_date=null) {
         if ($current_date === null) {
-            $this->current_date = new \DateTime('today');
+            $current_date = new \DateTime('today');
         }
+
+        $this->current_date = $current_date;
     }
 
     /**
