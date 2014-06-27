@@ -9,6 +9,9 @@
 namespace ebussola\goalr;
 
 
+use ebussola\common\datatype\number\Percentage;
+use ebussola\common\datatype\Number;
+
 class Goalr {
 
     /**
@@ -60,10 +63,6 @@ class Goalr {
         return $date_start->diff($date_end->add(new \DateInterval('P1D')))->days;
     }
 
-    private function calcPercentage($daily_budget, $variation) {
-        return $daily_budget + ($daily_budget * ($variation / 100));
-    }
-
     /**
      * @param Goal  $goal
      * @param Event $event
@@ -75,20 +74,23 @@ class Goalr {
         $days_to_event = $this->calcDiffDays($goal->date_start, $event->date_start);
         $days_of_event = $this->calcDiffDays($event->date_start, $event->date_end);
 
+        $daily_budget = new Number($daily_budget);
+        $variation = new Percentage($event->variation);
         if ($this->current_date < $event->date_start) {
-            $variated_budget = $this->calcPercentage($daily_budget, ($event->variation * -1));
 
-            if ($event->variation > 0) {
-                $variated_budget *= -1;
-            }
+            $variated_budget = $daily_budget->preserve()
+                ->bcadd($variation)
+                ->bcsub($daily_budget)
+                ->bcmul($days_of_event)
+                ->bcdiv($days_to_event);
 
-            $daily_budget += ($variated_budget * $days_of_event) / $days_to_event;
+            $daily_budget->bcsub($variated_budget);
 
         } else if ($this->current_date >= $event->date_start && $this->current_date <= $event->date_end) {
-            $daily_budget = $this->calcPercentage($daily_budget, $event->variation);
+            $daily_budget->bcadd($variation);
         }
 
-        return $daily_budget;
+        return $daily_budget->getValue();
     }
 
 }

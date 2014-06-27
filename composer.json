@@ -13,6 +13,10 @@
         "psr-0": {"ebussola\\goalr\\": "src/"}
     },
 
+    "require": {
+        "ebussola/common-datatype": "~2.1"
+    },
+
     "require-dev": {
         "phpunit/phpunit": "3.7.28"
     }
